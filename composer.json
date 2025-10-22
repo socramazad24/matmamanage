@@ -1,0 +1,40 @@
+{
+    "autoload-dev": {
+        "classmap": [
+            "src/"
+        ],
+        "psr-4": {
+            
+            "matmanager\\CRUD\\": "mat-manager/CRUD/",
+            "matmanager\\admin\\": "mat-manager/admin/",
+            "matmanager\\templates\\": "mat-manager/templates/",
+            "admin\\": "admin/",
+            "templates\\": "templates/",
+            "bodeguero\\": "bodeguero/",
+            "CRUD\\": "CRUD/",
+            "gerente\\": "gerente/",
+            "historial\\": "historial/",
+            "materiales\\": "materiales/",
+            "pedidos\\": "pedidos/",
+            "proveedores\\": "proveedores/",
+            "tables\\": "tables/",
+            "users\\": "users/",
+            "matmanager\\": "matmanager/",
+            "tests\\": "tests/",
+            "Database\\": "Database/"
+
+        }
+    },
+    
+        "require-dev": {
+            "phpunit/phpunit": "^9.5",
+            "phpmetrics/phpmetrics": "^2.8.2"
+        }
+    
+
+       
+        
+        
+    
+    
+}

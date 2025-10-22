@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerente - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Loopple/loopple-public-assets@main/riva-dashboard-tailwind/riva-dashboard.css">
+    <script src="../../tailwind.js" integrity="sha384-pXbtEM0s3abRFqEyAChS+PGW3VqbeR/BWCGz6yIMx1rq9ZyeEtJhfCHyPSUpD3XF" crossorigin="anonymous"></script>
+</head>
+<body class='bg-gray-100 h-max'>
+    <header class="bg-gray-800 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">MAT-MANAGER - Gerente</h1>
+            <div>
+                <span id="username" class="mr-4"></span>
+                <button onclick="Auth.logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="text-gray-600 body-font">
+        <div class="container px-5 py-24 mx-auto">
+            <div class="flex-wrap -m-4 flex justify-center items-center">
+                <div class="p-4 md:w-1/3">
+                    <div class="h-full rounded-xl shadow-cla-blue bg-gradient-to-r from-amber-50 to-yellow-50 overflow-hidden">
+                        <div class="p-6">
+                            <h1 class="title-font text-lg font-medium text-gray-900 mb-3">Materiales</h1>
+                            <p class="leading-relaxed mb-3">Ver y gestionar el inventario de materiales</p>
+                            <div class="flex items-center flex-wrap">
+                                <button class="bg-gradient-to-r from-amber-400 to-amber-500 hover:scale-105 drop-shadow-md px-4 py-1 rounded-lg text-gray-100">
+                                    <a href="materials.html">Ver Materiales</a>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 md:w-1/3">
+                    <div class="h-full rounded-xl shadow-cla-violate bg-gradient-to-r from-amber-50 to-yellow-50 overflow-hidden">
+                        <div class="p-6">
+                            <h1 class="title-font text-lg font-medium text-gray-900 mb-3">Pedidos</h1>
+                            <p class="leading-relaxed mb-3">Gestionar pedidos y órdenes de compra</p>
+                            <div class="flex items-center flex-wrap">
+                                <button class="bg-gradient-to-r from-orange-300 to-amber-400 text-white hover:scale-105 drop-shadow-md px-4 py-1 rounded-lg">
+                                    <a href="orders.html">Ver Pedidos</a>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        &copy; 2023 MAT-MANAGER
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        async function init() {
+            // Check authentication
+            const user = await Auth.redirectIfNotAuthenticated();
+            if (!user) return;
+
+            // Check role
+            if (user.role !== 'gerente') {
+                await Auth.redirectToDashboard(user.role);
+                return;
+            }
+
+            // Display username
+            document.getElementById('username').textContent = user.username;
+        }
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>

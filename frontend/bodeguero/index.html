@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bodeguero - Materiales</title>
+    <link rel="stylesheet" href="../../styles/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Loopple/loopple-public-assets@main/riva-dashboard-tailwind/riva-dashboard.css">
+    <script src="../../tailwind.js" integrity="sha384-pXbtEM0s3abRFqEyAChS+PGW3VqbeR/BWCGz6yIMx1rq9ZyeEtJhfCHyPSUpD3XF" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header class="bg-gray-800 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">MAT-MANAGER - Bodeguero</h1>
+            <div>
+                <span id="username" class="mr-4"></span>
+                <button onclick="Auth.logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="flex min-h-screen bg-gray-50 justify-center">
+        <div class="px-5 py-5 w-full max-w-7xl">
+            <h3 class="flex flex-col items-start justify-center m-2 ml-0 font-medium text-3xl">
+                <span class="mr-2 font-bold">Materiales</span>
+            </h3>
+
+            <!-- Search bar -->
+            <div class="mb-5">
+                <input 
+                    type="text" 
+                    id="search" 
+                    placeholder="Buscar materiales" 
+                    onkeyup="filterMaterials()" 
+                    class="border rounded-lg py-2 px-4 w-full max-w-md">
+            </div>
+
+            <!-- Materials grid -->
+            <div id="materialsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Materials will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white text-center py-4 mt-8">
+        &copy; 2023 MAT-MANAGER
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        let materials = [];
+
+        async function init() {
+            // Check authentication
+            const user = await Auth.redirectIfNotAuthenticated();
+            if (!user) return;
+
+            // Check role
+            if (user.role !== 'bodeguero') {
+                await Auth.redirectToDashboard(user.role);
+                return;
+            }
+
+            // Display username
+            document.getElementById('username').textContent = user.username;
+
+            // Load materials
+            await loadMaterials();
+        }
+
+        async function loadMaterials() {
+            try {
+                const response = await API.getMaterials();
+                materials = response.data;
+                renderMaterials(materials);
+            } catch (error) {
+                console.error('Error loading materials:', error);
+                alert('Error al cargar materiales');
+            }
+        }
+
+        function renderMaterials(materialsToRender) {
+            const grid = document.getElementById('materialsGrid');
+            
+            if (materialsToRender.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center text-gray-500">No se encontraron materiales</p>';
+                return;
+            }
+
+            grid.innerHTML = materialsToRender.map(material => `
+                <div class="material-card uppercase max-w-xl cursor-pointer rounded-lg bg-white p-5 shadow duration-150 hover:scale-105 hover:shadow-md">
+                    <div>
+                        <div class="my-4 flex items-center justify-between px-4">
+                            <p class="material-name font-bold text-2xl text-amber-500">${material.MaterialName}</p>
+                            <p class="material-id rounded-full bg-gray-400 px-3 py-2 text-xl font-semibold text-white">${material.idMaterial}</p>
+                        </div>
+                        <div class="my-4 flex items-center justify-between px-4">
+                            <p class="text-base font-semibold text-gray-500 mr-10">Descripción</p>
+                            <p class="material-description rounded-full bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-600">${material.Description}</p>
+                        </div>
+                        <div class="my-4 flex items-center justify-between px-4">
+                            <p class="text-base font-semibold text-gray-500 mr-10">Costo</p>
+                            <p class="material-cost rounded-full bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-600">$${material.costoUnitario}</p>
+                        </div>
+                        <div class="my-4 flex items-center justify-between px-4">
+                            <p class="text-base font-semibold text-gray-500 mr-10">Cantidad</p>
+                            <p class="material-quantity rounded-full bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-600">${material.cantidadMaterial}</p>
+                        </div>
+                        <div class="my-4 flex items-center justify-between px-4">
+                            <p class="text-base font-semibold text-gray-500 mr-10">Proveedor</p>
+                            <p class="material-provider rounded-full bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-600">${material.idProveedor}</p>
+                        </div>
+                        <div class="my-4 flex items-center justify-between px-4">
+                            <p class="text-base font-semibold text-gray-500 mr-10">Fecha</p>
+                            <p class="material-date rounded-full bg-gray-200 px-3 py-2 text-sm font-semibold text-gray-600">${material.date_reg}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMaterials() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            
+            const filtered = materials.filter(material => {
+                return (
+                    material.MaterialName.toLowerCase().includes(searchValue) ||
+                    material.Description.toLowerCase().includes(searchValue) ||
+                    material.idMaterial.toString().includes(searchValue) ||
+                    material.costoUnitario.toString().includes(searchValue) ||
+                    material.cantidadMaterial.toString().includes(searchValue) ||
+                    material.idProveedor.toLowerCase().includes(searchValue)
+                );
+            });
+
+            renderMaterials(filtered);
+        }
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>
